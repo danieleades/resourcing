@@ -87,6 +87,25 @@ impl SqliteRepository {
         let repo = Self { pool };
         Ok(repo)
     }
+
+    /// Fetches `(id, name)` pairs from the given `table` for `ids`.
+    async fn fetch_named_rows(
+        &self,
+        table: &str,
+        ids: &[Uuid],
+    ) -> sqlx::Result<Vec<(Uuid, String)>> {
+        if ids.is_empty() {
+            return Ok(vec![]);
+        }
+
+        let placeholders = vec!["?"; ids.len()].join(", ");
+        let sql = format!("SELECT id, name FROM {table} WHERE id IN ({placeholders})");
+        let mut query = sqlx::query_as::<_, (Uuid, String)>(&sql);
+        for id in ids {
+            query = query.bind(id);
+        }
+        query.fetch_all(&self.pool).await
+    }
 }
 
 #[async_trait]
@@ -229,17 +248,7 @@ impl Repository for SqliteRepository {
     }
 
     async fn projects(&self, ids: &[Uuid]) -> sqlx::Result<Vec<domain::Project>> {
-        if ids.is_empty() {
-            return Ok(vec![]);
-        }
-        let placeholders = vec!["?"; ids.len()].join(", ");
-        let sql = format!("SELECT id, name FROM projects WHERE id IN ({placeholders})");
-
-        let mut q = sqlx::query_as::<_, (Uuid, String)>(&sql);
-        for id in ids {
-            q = q.bind(id);
-        }
-        let rows = q.fetch_all(&self.pool).await?;
+        let rows = self.fetch_named_rows("projects", ids).await?;
         Ok(rows
             .into_iter()
             .map(|(id, name)| domain::Project { id, name })
@@ -247,17 +256,7 @@ impl Repository for SqliteRepository {
     }
 
     async fn resources(&self, ids: &[Uuid]) -> sqlx::Result<Vec<domain::Resource>> {
-        if ids.is_empty() {
-            return Ok(vec![]);
-        }
-        let placeholders = vec!["?"; ids.len()].join(", ");
-        let sql = format!("SELECT id, name FROM resources WHERE id IN ({placeholders})");
-
-        let mut q = sqlx::query_as::<_, (Uuid, String)>(&sql);
-        for id in ids {
-            q = q.bind(id);
-        }
-        let rows = q.fetch_all(&self.pool).await?;
+        let rows = self.fetch_named_rows("resources", ids).await?;
         Ok(rows
             .into_iter()
             .map(|(id, name)| domain::Resource { id, name })
