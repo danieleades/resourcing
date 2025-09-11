@@ -1,0 +1,22 @@
+[package]
+name = "backend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+backend-core = { version = "0.1.0", path = "backend-core" }
+tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
+async-graphql = "7.0.17"
+async-graphql-axum = "7.0.17"
+axum = { version = "0.7", features = ["http1", "http2", "json"] }
+tower-http = { version = "0.5", features = ["cors"] }
+
+[lints]
+workspace = true
+
+[workspace]
+members = ["xtask", "backend-core"]
+
+[workspace.lints.clippy]
+pedantic = "warn"
+nursery = "warn"

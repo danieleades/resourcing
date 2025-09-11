@@ -1,0 +1,43 @@
+# Repository Guidelines
+
+## Project Structure & Module Organization
+- `backend/`: Rust GraphQL service (Axum + async-graphql).
+  - `backend-core/`: domain, repo, GraphQL schema and `migrations/`.
+  - `xtask/`: helpers (e.g., demo DB generator).
+  - `data/`: local artifacts (schemas/DB); ignored in Git.
+- `frontend/`: SvelteKit app (Vite), talks to `/graphql`.
+  - `src/lib/components/`: UI components; assets in `src/lib/assets/`.
+  - Tests under `src/**/*.spec.ts` and `e2e/`.
+- `reqs/`: specification and feature descriptions.
+
+## Build, Test, and Development Commands
+- Backend (from `backend/`):
+  - `just dev db=./data/dev.db`: run with a file DB. Env: `DATABASE_URL` set for you.
+  - `just demo`: create demo DB and run server on `:8000`.
+  - `just schema out=./data/schema.graphql`: write GraphQL schema.
+  - `cargo run`: run (requires `DATABASE_URL`, e.g. `sqlite:./data/dev.db`).
+- Frontend (from `frontend/`):
+  - `npm run dev`: start app on `:5173` (proxies `/graphql` to `:8000`).
+  - `npm run build` / `npm run preview`: build and preview.
+  - `npm run test`: run unit (Vitest) + e2e (Playwright).
+  - `npm run lint` / `npm run format`: ESLint/Prettier.
+
+Example dev loop: in `backend/` run `just demo`; in `frontend/` run `npm run dev` and visit `http://localhost:5173`.
+
+## Coding Style & Naming Conventions
+- Rust: `rustfmt` + `clippy` (`just fmt`, `just clippy`). Modules and functions `snake_case`; types `PascalCase`. Keep crates focused (`backend` for HTTP, `backend-core` for domain/DB/GraphQL).
+- TypeScript/Svelte: 2-space indent, Prettier + ESLint (`npm run lint`). Components `PascalCase.svelte`; files/functions `camelCase.ts`.
+- GraphQL: colocate documents in `frontend/src/lib/gql/`; regenerate types with `npm run codegen` (backend must be running).
+
+## Testing Guidelines
+- Frontend unit: Vitest in `src/**/*.{test,spec}.ts` and `*.svelte.spec.ts` (browser + node projects). Run `npm run test:unit -- --run`.
+- Frontend e2e: Playwright specs in `frontend/e2e/`; backend must run. Run `npm run test:e2e`.
+- Backend: add Rust tests with `#[cfg(test)]` or integration tests under `backend/tests/`; run with `cargo test`.
+
+## Commit & Pull Request Guidelines
+- Commits: imperative mood and scoped prefixes when helpful, e.g. `frontend: add ProjectAssignmentTable`, `backend-core: fix repo filtering`.
+- PRs: clear description, rationale, and scope; link issues; include screenshots for UI changes and sample GraphQL queries for API changes; note migration impacts.
+
+## Security & Configuration Tips
+- Never commit secrets or DB files; use `DATABASE_URL` (e.g., `sqlite:./data/dev.db`).
+- Dev proxy: `/graphql` is proxied by Vite; production should configure the API URL via env or reverse proxy.

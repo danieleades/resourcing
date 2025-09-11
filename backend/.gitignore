@@ -1,0 +1,6 @@
+# Build artifacts
+/target/
+/.target/
+
+# Misc
+.DS_Store

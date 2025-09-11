@@ -1,0 +1,34 @@
+# Run with a local SQLite file
+dev db="./data/dev.db":
+    DATABASE_URL="sqlite:{{db}}" cargo run
+
+# Generate a demo DB, then run with it
+demo db="./data/demo.db":
+    rm -f "{{db}}"
+    cargo xtask generate-demo "{{db}}"
+    DATABASE_URL="sqlite:{{db}}" cargo run
+
+# Generate only the demo DB file (no server)
+gen-demo db="./demo.db":
+    cargo xtask generate-demo "{{db}}"
+
+# Run pointing at an isolated file DB for E2E or parallel runs
+e2e db="/tmp/backend-rs-e2e-1.db":
+    rm -f "{{db}}"
+    DATABASE_URL="sqlite:{{db}}" cargo run
+
+# Run with an in-memory DB (non-persistent, lasts for process lifetime)
+e2e-mem:
+    DATABASE_URL="sqlite::memory:" cargo run
+
+build:
+    cargo build
+
+check:
+    cargo check
+
+fmt:
+    cargo fmt --all
+
+clippy:
+    cargo clippy --all-targets -- -D warnings

@@ -1,0 +1,141 @@
+# GraphQL Schema for Resource and Project Management
+
+# Custom scalar for month validation
+scalar Month # Format: "YYYY-MM"
+
+# Types
+type Resource {
+  id: ID!
+  name: String!
+  assignments: [Assignment!]!
+}
+
+type Project {
+  id: ID!
+  name: String!
+  assignments: [Assignment!]!
+}
+
+type Assignment {
+  id: ID!
+  resource: Resource!
+  project: Project!
+  month: Month!
+}
+
+# ----------------------------
+# Table-optimised, pivoted shapes
+# ----------------------------
+
+"""
+Cell in the project×month matrix.
+Empties are included by contract: resources is [] when no assignments exist.
+"""
+type ProjectMonthCell {
+  resources: [Resource!]!
+}
+
+"""
+Row in the project×month matrix. cells.length == months.length by contract.
+"""
+type ProjectMonthMatrixRow {
+  project: Project!
+  cells: [ProjectMonthCell!]!
+}
+
+"""
+Pivoted result for the Project Assignments table.
+months echoes input order and defines column order.
+rows contains all projects, even if all cells are empty.
+"""
+type ProjectMonthMatrix {
+  months: [Month!]!
+  rows: [ProjectMonthMatrixRow!]!
+}
+
+"""
+Cell in the resource×month matrix.
+Empties are included by contract: projects is [] when no assignments exist.
+"""
+type ResourceMonthCell {
+  projects: [Project!]!
+}
+
+"""
+Row in the resource×month matrix. cells.length == months.length by contract.
+"""
+type ResourceMonthMatrixRow {
+  resource: Resource!
+  cells: [ResourceMonthCell!]!
+}
+
+"""
+Pivoted result for the Resource Assignments table.
+months echoes input order and defines column order.
+rows contains all resources, even if all cells are empty.
+"""
+type ResourceMonthMatrix {
+  months: [Month!]!
+  rows: [ResourceMonthMatrixRow!]!
+}
+
+# ----------------------------
+# Root Query
+# ----------------------------
+type Query {
+  # Basic queries
+  resources: [Resource!]!
+  projects: [Project!]!
+  assignments: [Assignment!]!
+  resource(id: ID!): Resource
+  project(id: ID!): Project
+
+  # Tables (exactly two, pivoted)
+  """
+  Project Assignments:
+  - Rows are projects
+  - Columns are months (from the months argument, order preserved)
+  - Cells are lists of resources
+  CONTRACT:
+    * months in response == months argument (order preserved)
+    * rows includes all projects
+    * for each row, cells.length == months.length
+    * empty cells contain resources: []
+  """
+  projectMonthMatrix(months: [Month!]!): ProjectMonthMatrix!
+
+  """
+  Resource Assignments:
+  - Rows are resources
+  - Columns are months (from the months argument, order preserved)
+  - Cells are lists of projects
+  CONTRACT:
+    * months in response == months argument (order preserved)
+    * rows includes all resources
+    * for each row, cells.length == months.length
+    * empty cells contain projects: []
+  """
+  resourceMonthMatrix(months: [Month!]!): ResourceMonthMatrix!
+}
+
+# ----------------------------
+# Root Mutation
+# ----------------------------
+type Mutation {
+  createResource(input: CreateResourceInput!): Resource!
+  deleteResource(id: ID!): Boolean!
+
+  createProject(input: CreateProjectInput!): Project!
+  deleteProject(id: ID!): Boolean!
+
+  assign(input: AssignInput!): Assignment!
+  unassign(input: UnassignInput!): Boolean!
+}
+
+# ----------------------------
+# Inputs
+# ----------------------------
+input CreateResourceInput { name: String! }
+input CreateProjectInput { name: String! }
+input AssignInput { resourceId: ID!, projectId: ID!, month: Month! }
+input UnassignInput { resourceId: ID!, projectId: ID!, month: Month! }

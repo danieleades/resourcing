@@ -1,0 +1,14 @@
+[package]
+name = "xtask"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+sqlx = { version = "0.8.6", default-features = false, features = ["runtime-tokio", "sqlite", "macros", "migrate"] }
+time = "0.3"
+backend-core = { version = "0.1.0", path = "../backend-core" }
+uuid = { version = "1.18.1", features = ["v4"] }
+
+[lints]
+workspace = true
