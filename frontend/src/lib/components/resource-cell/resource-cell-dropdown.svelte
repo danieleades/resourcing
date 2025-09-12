@@ -1,7 +1,14 @@
 <script lang="ts">
 	import { Plus } from '@lucide/svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { DropdownMenu, DropdownMenuLabel, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuGroup } from '$lib/components/ui/dropdown-menu';
+	import {
+		DropdownMenu,
+		DropdownMenuLabel,
+		DropdownMenuItem,
+		DropdownMenuTrigger,
+		DropdownMenuContent,
+		DropdownMenuGroup
+	} from '$lib/components/ui/dropdown-menu';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Checkbox } from '$lib/components/ui/checkbox';
@@ -74,7 +81,7 @@
 			{#if filteredResources.length === 0}
 				<DropdownMenuItem disabled>No matches</DropdownMenuItem>
 			{:else}
-				{#each filteredResources as r}
+				{#each filteredResources as r (r)}
 					<DropdownMenuItem>
 						<span class="flex w-full items-center justify-between">
 							<span>{r.name}</span>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Plus, Copy, X } from '@lucide/svelte';
+	import { Copy, X } from '@lucide/svelte';
 	import { Button } from '$lib/components/ui/button';
 	import ResourceCellDropdown from './resource-cell-dropdown.svelte';
 
@@ -15,7 +15,7 @@
 <div class="relative group align-top">
 	<div class="min-h-12 flex flex-col gap-1">
 		{#if hasResources()}
-			{#each resources as resource}
+			{#each resources as resource (resource)}
 				<div class="flex items-center justify-between bg-blue-50 px-2 py-1 rounded text-xs">
 					<span class="text-blue-800">{resource}</span>
 
