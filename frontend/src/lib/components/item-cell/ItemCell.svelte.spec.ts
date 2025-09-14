@@ -4,14 +4,14 @@ import ItemCell from './ItemCell.svelte';
 
 describe('ItemCell', () => {
 	it('renders provided items', () => {
-		render(ItemCell, { items: ['Alpha', 'Bravo'] });
+		render(ItemCell, { props: { items: ['Alpha', 'Bravo'] } });
 		expect(screen.getByText('Alpha')).toBeDefined();
 		expect(screen.getByText('Bravo')).toBeDefined();
 		expect(screen.queryByText('-')).toBeNull();
 	});
 
 	it('shows placeholder when no items', () => {
-		render(ItemCell, { items: [] });
+		render(ItemCell, { props: { items: [] } });
 		expect(screen.getByText('-')).toBeDefined();
 	});
 });
