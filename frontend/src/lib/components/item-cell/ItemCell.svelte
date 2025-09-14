@@ -1,23 +1,23 @@
 <script lang="ts">
 	import { Copy, X } from '@lucide/svelte';
 	import { Button } from '$lib/components/ui/button';
-	import ResourceCellDropdown from './resource-cell-dropdown.svelte';
+	import ItemCellDropdown from './ItemCellDropdown.svelte';
 
 	export interface Props {
-		resources: string[];
+		items: string[];
 	}
 
-	const { resources = [] }: Props = $props();
+	const { items = [] }: Props = $props();
 
-	const hasResources = $derived(() => resources.length > 0);
+	const hasItems = $derived(() => items.length > 0);
 </script>
 
 <div class="relative group align-top">
 	<div class="min-h-12 flex flex-col gap-1">
-		{#if hasResources()}
-			{#each resources as resource (resource)}
+		{#if hasItems()}
+			{#each items as item (item)}
 				<div class="flex items-center justify-between bg-blue-50 px-2 py-1 rounded text-xs">
-					<span class="text-blue-800">{resource}</span>
+					<span class="text-blue-800">{item}</span>
 
 					<!-- Remove (disabled, visual only) -->
 					<Button
@@ -26,7 +26,7 @@
 						disabled
 						aria-disabled="true"
 						class="ml-1 h-auto w-auto p-0 rounded text-blue-600 hover:text-red-600 hover:bg-transparent focus-visible:ring-1"
-						title="Remove resource"
+						title="Remove item"
 					>
 						<X size={12} aria-hidden="true" />
 					</Button>
@@ -41,7 +41,7 @@
 			class="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
 		>
 			<!-- Add -->
-			<ResourceCellDropdown />
+			<ItemCellDropdown />
 
 			<Button
 				variant="ghost"

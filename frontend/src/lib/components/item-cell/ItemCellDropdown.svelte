@@ -13,10 +13,10 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 
-	type Resource = { name: string; available: boolean };
+	type Item = { name: string; available: boolean };
 
 	// Demo data
-	let resources = $state<Resource[]>([
+	let items = $state<Item[]>([
 		{ name: 'AUV-Alpha', available: true },
 		{ name: 'AUV-Bravo', available: true },
 		{ name: 'UUV-Charlie', available: false },
@@ -34,10 +34,10 @@
 	const normalizedQuery = $derived(query.trim().toLowerCase());
 
 	// If showUnavailable is false, filter out unavailable items. Otherwise include all.
-	const filteredResources = $derived(
-		resources
-			.filter((r) => showUnavailable || r.available)
-			.filter((r) => r.name.toLowerCase().includes(normalizedQuery))
+	const filteredItems = $derived(
+		items
+			.filter((i) => showUnavailable || i.available)
+			.filter((i) => i.name.toLowerCase().includes(normalizedQuery))
 	);
 </script>
 
@@ -47,22 +47,22 @@
 			variant="ghost"
 			size="icon"
 			class="h-auto w-auto p-1 rounded text-blue-600 hover:text-blue-800 hover:bg-blue-50 focus-visible:ring-1"
-			title="Add resource"
+			title="Add item"
 		>
 			<Plus size={14} aria-hidden="true" />
 		</Button>
 	</DropdownMenuTrigger>
 
 	<DropdownMenuContent class="w-64">
-		<DropdownMenuLabel>Find Resources</DropdownMenuLabel>
+		<DropdownMenuLabel>Find Items</DropdownMenuLabel>
 
 		<div class="px-2 py-2 space-y-3">
 			<div class="space-y-1">
 				<Input
-					id="resource-search"
+					id="item-search"
 					placeholder="Start typing…"
 					autocomplete="off"
-					aria-label="Filter resources by name"
+					aria-label="Filter items by name"
 					bind:value={query}
 				/>
 			</div>
@@ -71,21 +71,21 @@
 				<Checkbox
 					id="show-unavailable"
 					bind:checked={showUnavailable}
-					aria-label="Show unavailable resources"
+					aria-label="Show unavailable items"
 				/>
 				<Label for="show-unavailable">Show unavailable</Label>
 			</div>
 		</div>
 
 		<DropdownMenuGroup>
-			{#if filteredResources.length === 0}
+			{#if filteredItems.length === 0}
 				<DropdownMenuItem disabled>No matches</DropdownMenuItem>
 			{:else}
-				{#each filteredResources as r (r)}
+				{#each filteredItems as i (i)}
 					<DropdownMenuItem>
 						<span class="flex w-full items-center justify-between">
-							<span>{r.name}</span>
-							{#if !r.available}
+							<span>{i.name}</span>
+							{#if !i.available}
 								<span class="text-xs text-muted-foreground">unavailable</span>
 							{/if}
 						</span>

@@ -1,4 +1,4 @@
-import { ResourceCell } from '$lib/components/resource-cell';
+import { ItemCell } from '$lib/components/item-cell';
 import { renderComponent, type ColumnDef } from '@tanstack/svelte-table';
 
 // --- Row model for the table (pivoted) ---
@@ -33,8 +33,8 @@ export function makeColumns(months: string[]): ColumnDef<ProjectMonthMatrixRow>[
 		header: m,
 		accessorFn: (row) => row.cells[i].resources,
 		cell: ({ getValue }) => {
-			const resources = (getValue() as RowResource[]).map((r) => r.name);
-			return renderComponent(ResourceCell, { resources });
+			const items = (getValue() as RowResource[]).map((r) => r.name);
+			return renderComponent(ItemCell, { items });
 		}
 	}));
 
