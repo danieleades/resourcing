@@ -19,7 +19,11 @@ describe('makeColumns', () => {
 				{ resources: [{ id: 'r2', name: 'Res2' }] }
 			]
 		};
-		const accessor = columns[1].accessorFn!;
+		const accessor = (
+			columns[1] as unknown as {
+				accessorFn: (row: ProjectMonthMatrixRow) => unknown;
+			}
+		).accessorFn;
 		expect(accessor(row)).toEqual(row.cells[0].resources);
 	});
 });
