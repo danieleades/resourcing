@@ -1,5 +1,5 @@
 import { ItemCell } from '$lib/components/item-cell';
-import { renderComponent, type ColumnDef } from '@tanstack/svelte-table';
+import { renderComponent, type AccessorFnColumnDef } from '@tanstack/svelte-table';
 
 // --- Row model for the table (pivoted) ---
 export interface RowResource {
@@ -17,9 +17,11 @@ export interface ProjectMonthMatrixRow {
 
 // --- TanStack columns (dynamic per months) ---
 // Kept concise: use accessorFn and a local cast in the cell to avoid verbose generics
-export function makeColumns(months: string[]): ColumnDef<ProjectMonthMatrixRow>[] {
+export function makeColumns(
+	months: string[]
+): AccessorFnColumnDef<ProjectMonthMatrixRow, unknown>[] {
 	// First fixed column for project name
-	const fixed: ColumnDef<ProjectMonthMatrixRow>[] = [
+	const fixed: AccessorFnColumnDef<ProjectMonthMatrixRow, unknown>[] = [
 		{
 			id: 'project',
 			header: 'Project',
@@ -28,7 +30,7 @@ export function makeColumns(months: string[]): ColumnDef<ProjectMonthMatrixRow>[
 	];
 
 	// One column per requested month (order preserved)
-	const monthCols: ColumnDef<ProjectMonthMatrixRow>[] = months.map((m, i) => ({
+	const monthCols: AccessorFnColumnDef<ProjectMonthMatrixRow, unknown>[] = months.map((m, i) => ({
 		id: m,
 		header: m,
 		accessorFn: (row) => row.cells[i].resources,
