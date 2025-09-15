@@ -2,7 +2,7 @@
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { gql, GraphQLClient } from 'graphql-request';
 	import { onMount } from 'svelte';
-	import DataTable from './data-table.svelte';
+	import DataTable from './DataTable.svelte';
 	import { makeColumns, type ProjectMonthMatrixRow } from './columns';
 
 	// After you run codegen with the new operation below, these types will exist:

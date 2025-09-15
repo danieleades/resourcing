@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Copy, X } from '@lucide/svelte';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/shadcn/button';
 	import ItemCellDropdown from './ItemCellDropdown.svelte';
 
 	export interface Props {
