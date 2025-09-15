@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Plus } from '@lucide/svelte';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/shadcn/button';
 	import {
 		DropdownMenu,
 		DropdownMenuLabel,
@@ -8,10 +8,10 @@
 		DropdownMenuTrigger,
 		DropdownMenuContent,
 		DropdownMenuGroup
-	} from '$lib/components/ui/dropdown-menu';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import { Checkbox } from '$lib/components/ui/checkbox';
+	} from '$lib/components/shadcn/dropdown-menu';
+	import { Input } from '$lib/components/shadcn/input';
+	import { Label } from '$lib/components/shadcn/label';
+	import { Checkbox } from '$lib/components/shadcn/checkbox';
 
 	type Item = { name: string; available: boolean };
 

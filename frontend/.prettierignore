@@ -9,5 +9,5 @@ bun.lockb
 /static/
 
 # Generated/Vendored Files
-src/lib/components/ui/
+src/lib/components/shadcn/
 src/lib/gql/
