@@ -5,9 +5,10 @@
 
 	export interface Props {
 		items: string[];
+		onAdd: (name: string) => void;
 	}
 
-	const { items = [] }: Props = $props();
+	const { items = [], onAdd }: Props = $props();
 
 	const hasItems = $derived(() => items.length > 0);
 </script>
@@ -41,7 +42,7 @@
 			class="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
 		>
 			<!-- Add -->
-			<ItemCellDropdown />
+			<ItemCellDropdown {onAdd} />
 
 			<Button
 				variant="ghost"

@@ -18,7 +18,8 @@ export interface ProjectMonthMatrixRow {
 // --- TanStack columns (dynamic per months) ---
 // Kept concise: use accessorFn and a local cast in the cell to avoid verbose generics
 export function makeColumns(
-	months: string[]
+	months: string[],
+	onAdd: (name: string) => void
 ): AccessorFnColumnDef<ProjectMonthMatrixRow, unknown>[] {
 	// First fixed column for project name
 	const fixed: AccessorFnColumnDef<ProjectMonthMatrixRow, unknown>[] = [
@@ -36,7 +37,7 @@ export function makeColumns(
 		accessorFn: (row) => row.cells[i].resources,
 		cell: ({ getValue }) => {
 			const items = (getValue() as RowResource[]).map((r) => r.name);
-			return renderComponent(ItemCell, { items });
+			return renderComponent(ItemCell, { items, onAdd });
 		}
 	}));
 

@@ -4,7 +4,7 @@ import { makeColumns, type ProjectMonthMatrixRow } from './columns';
 describe('makeColumns', () => {
 	it('creates a project column and one column per month', () => {
 		const months = ['2025-06', '2025-07'];
-		const columns = makeColumns(months);
+		const columns = makeColumns(months, () => {});
 		expect(columns).toHaveLength(3);
 		expect(columns[0].id).toBe('project');
 		expect(columns[0].header).toBe('Project');
