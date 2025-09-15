@@ -1,9 +1,8 @@
 <script lang="ts">
-	import type { ColumnDef } from '@tanstack/table-core';
 	import { gql, GraphQLClient } from 'graphql-request';
 	import { onMount } from 'svelte';
 	import DataTable from './DataTable.svelte';
-	import { makeColumns, type ProjectMonthMatrixRow } from './columns';
+	import type { ProjectMonthMatrixRow } from './columns';
 
 	// After you run codegen with the new operation below, these types will exist:
 	import type {
@@ -64,7 +63,7 @@
 
 	// --- state ---
 	let rows = $state<ProjectMonthMatrixRow[]>([]);
-	let columns = $state<ColumnDef<ProjectMonthMatrixRow>[]>([]);
+	let months = $state<string[]>([]);
 	let error = $state<string | null>(null);
 	let loading = $state(true);
 
@@ -75,7 +74,7 @@
 		try {
 			const res = await fetchProjectMonthMatrix(requestedMonths);
 			rows = res.rows;
-			columns = makeColumns(res.months);
+			months = res.months;
 		} catch (e) {
 			error = e instanceof Error ? e.message : String(e);
 		} finally {
@@ -90,5 +89,5 @@
 {:else if error}
 	<p style="color: crimson;">Error: {error}</p>
 {:else}
-	<DataTable {columns} data={rows} />
+	<DataTable data={rows} {months} />
 {/if}

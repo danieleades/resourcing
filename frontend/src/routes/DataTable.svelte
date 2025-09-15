@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { type ColumnDef } from '@tanstack/table-core';
 	import { createSvelteTable, getCoreRowModel, flexRender } from '@tanstack/svelte-table';
-	import type { ProjectMonthMatrixRow } from './columns';
+	import { makeColumns, type ProjectMonthMatrixRow } from './columns';
 	import {
 		Table,
 		TableHeader,
@@ -12,17 +11,26 @@
 	} from '$lib/components/shadcn/table';
 
 	type DataTableProps = {
-		columns: ColumnDef<ProjectMonthMatrixRow>[];
+		months: string[];
 		data: ProjectMonthMatrixRow[];
 	};
 
-	let { data, columns }: DataTableProps = $props();
+	let { data, months }: DataTableProps = $props();
+
+	function handleAdd(name: string) {
+		void name;
+		// no-op for now
+	}
+
+	const columns = $derived(() => makeColumns(months, handleAdd));
 
 	const table = createSvelteTable({
 		get data() {
 			return data;
 		},
-		columns,
+		get columns() {
+			return columns();
+		},
 		getCoreRowModel: getCoreRowModel()
 	});
 </script>
@@ -56,7 +64,7 @@
 				</TableRow>
 			{:else}
 				<TableRow>
-					<TableCell colspan={columns.length} class="h-24 text-center">No results.</TableCell>
+					<TableCell colspan={columns().length} class="h-24 text-center">No results.</TableCell>
 				</TableRow>
 			{/each}
 		</TableBody>

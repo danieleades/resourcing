@@ -15,6 +15,12 @@
 
 	type Item = { name: string; available: boolean };
 
+	export interface Props {
+		onAdd: (name: string) => void;
+	}
+
+	const { onAdd }: Props = $props();
+
 	// Demo data
 	let items = $state<Item[]>([
 		{ name: 'AUV-Alpha', available: true },
@@ -82,7 +88,7 @@
 				<DropdownMenuItem disabled>No matches</DropdownMenuItem>
 			{:else}
 				{#each filteredItems as i (i)}
-					<DropdownMenuItem>
+					<DropdownMenuItem onSelect={() => onAdd(i.name)}>
 						<span class="flex w-full items-center justify-between">
 							<span>{i.name}</span>
 							{#if !i.available}
