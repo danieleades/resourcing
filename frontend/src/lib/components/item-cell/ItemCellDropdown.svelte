@@ -13,19 +13,27 @@
 	import { Label } from '$lib/components/shadcn/label';
 	import { Checkbox } from '$lib/components/shadcn/checkbox';
 
-	type Item = { name: string; available: boolean };
+	export type Item = { id: string; name: string; available: boolean };
+
+	interface Props {
+		items: Item[];
+		onAdd: (id: string) => Promise<unknown> | unknown;
+		onChange?: () => void;
+	}
+
+	const { items, onAdd, onChange }: Props = $props();
 
 	// Demo data
-	let items = $state<Item[]>([
-		{ name: 'AUV-Alpha', available: true },
-		{ name: 'AUV-Bravo', available: true },
-		{ name: 'UUV-Charlie', available: false },
-		{ name: 'ROV-Delta', available: true },
-		{ name: 'Glider-Echo', available: false },
-		{ name: 'Sensor-Foxtrot', available: true },
-		{ name: 'Beacon-Golf', available: false },
-		{ name: 'USV-Hotel', available: true }
-	]);
+	// let items = $state<Item[]>([
+	// 	{ name: 'AUV-Alpha', available: true },
+	// 	{ name: 'AUV-Bravo', available: true },
+	// 	{ name: 'UUV-Charlie', available: false },
+	// 	{ name: 'ROV-Delta', available: true },
+	// 	{ name: 'Glider-Echo', available: false },
+	// 	{ name: 'Sensor-Foxtrot', available: true },
+	// 	{ name: 'Beacon-Golf', available: false },
+	// 	{ name: 'USV-Hotel', available: true }
+	// ]);
 
 	let query = $state('');
 	// Defaults to false as requested
@@ -39,6 +47,12 @@
 			.filter((i) => showUnavailable || i.available)
 			.filter((i) => i.name.toLowerCase().includes(normalizedQuery))
 	);
+
+	async function handleSelect(id: string) {
+		const result = await onAdd(id);
+		if (result === false) return;
+		onChange?.();
+	}
 </script>
 
 <DropdownMenu>
@@ -82,7 +96,7 @@
 				<DropdownMenuItem disabled>No matches</DropdownMenuItem>
 			{:else}
 				{#each filteredItems as i (i)}
-					<DropdownMenuItem>
+					<DropdownMenuItem onclick={() => void handleSelect(i.id)}>
 						<span class="flex w-full items-center justify-between">
 							<span>{i.name}</span>
 							{#if !i.available}

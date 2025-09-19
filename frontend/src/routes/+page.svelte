@@ -3,13 +3,8 @@
 	import { gql, GraphQLClient } from 'graphql-request';
 	import { onMount } from 'svelte';
 	import DataTable from './DataTable.svelte';
-	import { makeColumns, type ProjectMonthMatrixRow } from './columns';
-
-	// After you run codegen with the new operation below, these types will exist:
-	import type {
-		GetProjectMonthMatrixQuery,
-		GetProjectMonthMatrixQueryVariables
-	} from '$lib/gql/graphql';
+	import { makeColumns, type ProjectMonthMatrixRow, type ProjectMonthCell } from './columns';
+	import type { GetProjectMonthMatrixQueryVariables } from '$lib/gql/graphql';
 
 	// --- GraphQL (pivoted) ---
 	const GET_PROJECT_MONTH_MATRIX = gql`
@@ -29,6 +24,16 @@
 					}
 				}
 			}
+			resources {
+				id
+				name
+				assignments {
+					month
+					project {
+						id
+					}
+				}
+			}
 		}
 	`;
 
@@ -37,6 +42,26 @@
 	// still routes through Vite's dev proxy in development.
 
 	// --- Fetch & mapping ---
+	type RawProjectMonthMatrix = {
+		projectMonthMatrix: {
+			months: Array<unknown>;
+			rows: Array<{
+				project: { id: unknown; name: string };
+				cells: Array<{
+					resources: Array<{ id: unknown; name: string }>;
+				}>;
+			}>;
+		};
+		resources: Array<{
+			id: unknown;
+			name: string;
+			assignments: Array<{
+				month: unknown;
+				project: { id: unknown };
+			}>;
+		}>;
+	};
+
 	async function fetchProjectMonthMatrix(months: string[]): Promise<{
 		months: string[];
 		rows: ProjectMonthMatrixRow[];
@@ -44,20 +69,64 @@
 		const endpoint = new URL('/graphql', window.location.origin).toString();
 		const graphqlClient = new GraphQLClient(endpoint);
 		const variables: GetProjectMonthMatrixQueryVariables = { months };
-		const data = await graphqlClient.request<
-			GetProjectMonthMatrixQuery,
-			GetProjectMonthMatrixQueryVariables
-		>(GET_PROJECT_MONTH_MATRIX, variables);
+		const data = await graphqlClient.request<RawProjectMonthMatrix>(
+			GET_PROJECT_MONTH_MATRIX,
+			variables
+		);
+
+		const resources = data.resources.map((resource) => ({
+			id: String(resource.id),
+			name: resource.name,
+			assignments: resource.assignments.map((assignment) => ({
+				month: String(assignment.month),
+				projectId: String(assignment.project.id)
+			}))
+		}));
 
 		const outMonths = data.projectMonthMatrix.months.map(String);
 
-		const outRows: ProjectMonthMatrixRow[] = data.projectMonthMatrix.rows.map((r) => ({
-			projectId: String(r.project.id),
-			projectName: r.project.name,
-			cells: r.cells.map((c) => ({
-				resources: c.resources.map((rr) => ({ id: String(rr.id), name: rr.name }))
-			}))
-		}));
+		const outRows: ProjectMonthMatrixRow[] = data.projectMonthMatrix.rows.map((row) => {
+			const projectId = String(row.project.id);
+
+			return {
+				projectId,
+				projectName: row.project.name,
+				cells: row.cells.map<ProjectMonthCell>((cell, columnIndex) => {
+					const month = outMonths[columnIndex];
+					const assignedResources = cell.resources.map((resource) => ({
+						id: String(resource.id),
+						name: resource.name
+					}));
+
+					const dropdownItems = resources
+						.map((resource) => {
+							const assignmentsInMonth = resource.assignments.filter(
+								(assignment) => assignment.month === month
+							);
+							const assignedToCurrentProject = assignmentsInMonth.some(
+								(assignment) => assignment.projectId === projectId
+							);
+							if (assignedToCurrentProject) {
+								return null;
+							}
+							const assignedElsewhere = assignmentsInMonth.some(
+								(assignment) => assignment.projectId !== projectId
+							);
+							return {
+								id: resource.id,
+								name: resource.name,
+								available: !assignedElsewhere
+							};
+						})
+						.filter((item): item is ProjectMonthCell['dropdownItems'][number] => item !== null);
+
+					return {
+						resources: assignedResources,
+						dropdownItems
+					};
+				})
+			};
+		});
 
 		return { months: outMonths, rows: outRows };
 	}
@@ -71,16 +140,26 @@
 	// Example: request a few months
 	const requestedMonths = ['2025-06', '2025-07', '2025-08', '2025-09', '2025-10', '2025-11'];
 
-	onMount(async () => {
-		try {
-			const res = await fetchProjectMonthMatrix(requestedMonths);
-			rows = res.rows;
-			columns = makeColumns(res.months);
-		} catch (e) {
+	async function refreshData() {
+		const res = await fetchProjectMonthMatrix(requestedMonths);
+		rows = res.rows;
+		columns = makeColumns(res.months, handleChange);
+		error = null;
+	}
+
+	function handleChange() {
+		void refreshData().catch((e) => {
+			console.error('Failed to refresh matrix after change', e);
 			error = e instanceof Error ? e.message : String(e);
-		} finally {
-			loading = false;
-		}
+		});
+	}
+
+	onMount(async () => {
+		loading = true;
+		await refreshData().catch((e) => {
+			error = e instanceof Error ? e.message : String(e);
+		});
+		loading = false;
 	});
 </script>
 
