@@ -8,7 +8,7 @@ backend-core = { version = "0.1.0", path = "backend-core" }
 tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
 async-graphql = "7.0.17"
 async-graphql-axum = "7.0.17"
-axum = { version = "0.7", features = ["http1", "http2", "json"] }
+axum = { version = "0.8", features = ["http1", "http2", "json"] }
 tower-http = { version = "0.5", features = ["cors"] }
 
 [lints]
