@@ -24,7 +24,7 @@
 		"@graphql-codegen/typescript": "4.1.6",
 		"@graphql-codegen/typescript-document-nodes": "4.0.16",
 		"@internationalized/date": "^3.9.0",
-		"@lucide/svelte": "^0.515.0",
+		"@lucide/svelte": "^0.554.0",
 		"@playwright/test": "^1.49.1",
 		"@sveltejs/adapter-auto": "^6.0.0",
 		"@sveltejs/kit": "^2.22.0",
